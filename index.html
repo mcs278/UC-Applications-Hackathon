@@ -5,9 +5,78 @@
 <title>CS174A Midterm Hackathon</title>
 </head>
 
+<!-- vertex shader -->
+<script id="3d-vertex-shader" type="x-shader/x-vertex">
+attribute vec4 a_position;
+attribute vec3 a_normal;
+
+uniform mat4 u_worldViewProjection;
+uniform mat4 u_worldInverseTranspose;
+
+varying vec3 v_normal;
+
+void main() {
+  // Multiply the position by the matrix.
+  gl_Position = u_worldViewProjection * a_position;
+
+  // orient the normals and pass to the fragment shader
+  v_normal = mat3(u_worldInverseTranspose) * a_normal;
+}
+</script>
+<!-- fragment shader -->
+<script id="3d-fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+
+// Passed in from the vertex shader.
+varying vec3 v_normal;
+
+uniform vec3 u_reverseLightDirection;
+uniform vec4 u_color;
+
+void main() {
+  // because v_normal is a varying it's interpolated
+  // we it will not be a uint vector. Normalizing it
+  // will make it a unit vector again
+  vec3 normal = normalize(v_normal);
+
+  float light = dot(normal, u_reverseLightDirection);
+
+  gl_FragColor = u_color;
+
+  // Lets multiply just the color portion (not the alpha)
+  // by the light
+  gl_FragColor.rgb *= light;
+}
+</script>
+
+<script type="text/javascript" src="./webgl-utils.js"></script>
+<script type="text/javascript" src="./webgl-lessons-ui.js"></script>
+<script type="text/javascript" src="./webgl-lessons-helper.js"></script>
+<script type="text/javascript" src="./initShaders.js"></script>
+<script type="text/javascript" src="./m4.js"></script>
+<script type="text/javascript" src="UC_cubes.js"></script>
+
 <body>
-<canvas id="gl-canvas" width="512" height="512">
+<canvas id="gl-canvas" width="512"" height="512">
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
+<div id="uiContainer">
+  <div id="ui">
+    <div id="Year"></div>
+  </div>
+</div>
+
+
+<button id= "UCB">UC Berkeley</button>&nbsp&nbsp&nbsp&nbsp&nbsp
+<button id= "UCD">UC Davis</button>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<button id= "UCI">UC Irvine</button> </br>
+<button id= "UCLA">UC Los Angeles</button>&nbsp
+<button id= "UCM">UC Merced</button>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<button id= "UCR">UC Riverside</button> </br>
+<button id= "UCSD">UC San Diego</button>&nbsp&nbsp&nbsp
+<button id= "UCSB">UC Santa Barbara</button>&nbsp
+<button id= "UCSC">UC Santa Cruz</button>
+
+
 </body>
 </html>
